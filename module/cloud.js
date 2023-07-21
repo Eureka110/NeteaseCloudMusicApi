@@ -3,6 +3,16 @@ const uploadPlugin = require('../plugins/songUpload')
 const md5 = require('md5')
 module.exports = async (query, request) => {
   let ext = 'mp3'
+  console.log('query.songFile', query)
+  if (!query.songFile) {
+    return Promise.reject({
+      status: 500,
+      body: {
+        msg: '请上传音乐文件',
+        code: 500,
+      },
+    })
+  }
   if (query.songFile.name.indexOf('flac') > -1) {
     ext = 'flac'
   }
@@ -13,15 +23,7 @@ module.exports = async (query, request) => {
   query.cookie.os = 'pc'
   query.cookie.appver = '2.9.7'
   const bitrate = 999000
-  if (!query.songFile) {
-    return Promise.reject({
-      status: 500,
-      body: {
-        msg: '请上传音乐文件',
-        code: 500,
-      },
-    })
-  }
+
   if (!query.songFile.md5) {
     // 命令行上传没有md5和size信息,需要填充
     query.songFile.md5 = md5(query.songFile.data)
